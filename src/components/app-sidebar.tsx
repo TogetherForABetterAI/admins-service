@@ -13,7 +13,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 
-import { Search, Settings, UserRoundPlus, User, Plus, House } from "lucide-react"
+import { Search, Settings, UserRoundPlus, User, Plus, House, Database } from "lucide-react"
 import { usePathname } from "next/navigation";
 
 import { ReactNode } from "react";
@@ -24,11 +24,11 @@ const items = [
     url: "/",
     icon: House,
   },
-  {
-    title: "Search users",
-    url: "/search-users",
-    icon: Search,
-  },
+  // {
+  //   title: "Search users",
+  //   url: "/search-users",
+  //   icon: Search,
+  // },
   {
     title: "New User",
     url: "/new-user",
@@ -38,6 +38,11 @@ const items = [
     title: "Grant Access",
     url: "/grant-access",
     icon: UserRoundPlus,
+  },
+  {
+    title: "MLflow",
+    url: "/mlflow",
+    icon: Database,
   },
 ]
 

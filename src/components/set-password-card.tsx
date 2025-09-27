@@ -29,7 +29,7 @@ export function SetPasswordCard() {
   const email = searchParams.get("email");
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault(); 
+    e.preventDefault();
     console.log("Setting password to:", password1, password2);
 
     if (!password1 || !password2) {
@@ -42,7 +42,7 @@ export function SetPasswordCard() {
       return;
     }
     setLoading(true);
-    
+
     try {
       const response = await fetch("http://localhost:80/admins/signup", {
         method: "POST",
@@ -74,7 +74,7 @@ export function SetPasswordCard() {
     } finally {
       setLoading(false);
     }
-    router.push("/dashboard");
+    router.replace("/");
   };
 
   if (error) {
@@ -83,42 +83,42 @@ export function SetPasswordCard() {
   }
 
   return (
-     <Card className="w-full max-w-sm">
-        <CardHeader>
-          <CardTitle>Set a password</CardTitle>
-          <CardDescription>
-            Set a password for {email}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form>
-            <div className="flex flex-col gap-6">
-              <div className="grid gap-2">
-                <Label htmlFor="password1">Password</Label>
-                <Input
-                  id="password1"
-                  type="password"
-                  placeholder="••••••••"
-                  required
-                  value={password1}
-                  onChange={(e) => setPassword1(e.target.value)}
-                />
-              </div>
-              <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password2">Confirm Password</Label>
-                </div>
-                <Input id="password2" type="password" placeholder="••••••••" required value={password2} onChange={(e) => setPassword2(e.target.value)} />
-              </div>
+    <Card className="w-full max-w-sm">
+      <CardHeader>
+        <CardTitle>Set a password</CardTitle>
+        <CardDescription>
+          Set a password for {email}
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form>
+          <div className="flex flex-col gap-6">
+            <div className="grid gap-2">
+              <Label htmlFor="password1">Password</Label>
+              <Input
+                id="password1"
+                type="password"
+                placeholder="••••••••"
+                required
+                value={password1}
+                onChange={(e) => setPassword1(e.target.value)}
+              />
             </div>
-          </form>
-        </CardContent>
-        <CardFooter className="flex-col gap-2">
-          <Button type="submit" className="w-full" onClick={handleSubmit}>
-            {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Set Password"}
-          </Button>
-        </CardFooter>
-        <Toaster richColors />
-      </Card>
+            <div className="grid gap-2">
+              <div className="flex items-center">
+                <Label htmlFor="password2">Confirm Password</Label>
+              </div>
+              <Input id="password2" type="password" placeholder="••••••••" required value={password2} onChange={(e) => setPassword2(e.target.value)} />
+            </div>
+          </div>
+        </form>
+      </CardContent>
+      <CardFooter className="flex-col gap-2">
+        <Button type="submit" className="w-full" onClick={handleSubmit}>
+          {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Set Password"}
+        </Button>
+      </CardFooter>
+      <Toaster richColors />
+    </Card>
   )
 }
