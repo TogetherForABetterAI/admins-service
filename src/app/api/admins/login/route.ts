@@ -1,5 +1,4 @@
- import { cookies } from "next/headers";
- import { createClient } from "@/lib/supabase";    
+import { createClient } from "@/lib/supabase";
 
 export async function POST(req: Request) {
   const body = await req.json();
@@ -11,11 +10,17 @@ export async function POST(req: Request) {
     password: body.password,
   });
 
-  const cookiesStore = await cookies();
-
-  cookiesStore.set("email", body.email);
+  if (resp.error) {
+    return new Response(
+      JSON.stringify({ ok: false, message: resp.error.message }),
+      {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  }
 
   return new Response(JSON.stringify({ ok: true }), {
-  headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json" },
   });
 }

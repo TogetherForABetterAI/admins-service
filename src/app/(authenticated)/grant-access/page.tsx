@@ -21,7 +21,7 @@ import { Card } from "@/components/ui/card"
 import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { DataTable } from "@/components/data-table"
-import { columns, Admin } from "@/app/(authenticated)/grant-access/columns"
+import { UserType } from "@/lib/user_type";
 
 const FormSchema = z.object({
   email: z.string().email("Email must be a valid email address."),
@@ -103,9 +103,7 @@ export default function InputForm() {
       {adminsData && (
         <div className="p-8">
           <p className="text-muted-foreground">Current admins:</p>
-          <div className="container mx-auto p-16">
-            <DataTable columns={columns} data={adminsData} />
-          </div>
+          <DataTable type={UserType.ADMINS} />
         </div>
       )}
       <p className="p-8 text-muted-foreground">Enter the email address of the admin you want to invite.</p>

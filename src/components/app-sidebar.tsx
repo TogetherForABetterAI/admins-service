@@ -13,10 +13,26 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+
+
 import { Search, Settings, UserRoundPlus, User, Plus, House, Database } from "lucide-react"
 import { usePathname } from "next/navigation";
 
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
+import { Button } from "./ui/button";
+import { is } from "zod/v4/locales";
+import { toast, Toaster } from "sonner";
 
 const items = [
   {
@@ -24,11 +40,6 @@ const items = [
     url: "/",
     icon: House,
   },
-  // {
-  //   title: "Search users",
-  //   url: "/search-users",
-  //   icon: Search,
-  // },
   {
     title: "New User",
     url: "/new-user",
@@ -46,9 +57,22 @@ const items = [
   },
 ]
 
+
+
 export function AppSidebar({ children, email }: { children: ReactNode, email?: string }) {
   const pathname = usePathname();
   console.log("Current pathname:", pathname);
+
+  const logout = () => {
+    fetch("/api/admins/logout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    }).then(() => {
+      window.location.href = "/login";
+    }).catch((err) => {
+      toast.error("Error logging out. Please try again.");
+    });
+  }
 
   return (
     <SidebarProvider>
@@ -75,9 +99,28 @@ export function AppSidebar({ children, email }: { children: ReactNode, email?: s
                     </SidebarMenuItem>
                   );
                 })}
+
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
+
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button>Logout</Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you sure you want to logout?</AlertDialogTitle>
+              </AlertDialogHeader>
+              <AlertDialogDescription>
+              </AlertDialogDescription>
+              <AlertDialogFooter>
+                <AlertDialogCancel>No</AlertDialogCancel>
+                <AlertDialogAction onClick={logout}>Yes</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+
         </SidebarContent>
         <SidebarFooter />
       </Sidebar>
@@ -85,6 +128,7 @@ export function AppSidebar({ children, email }: { children: ReactNode, email?: s
         <SidebarTrigger />
         {children}
       </main>
-    </SidebarProvider>
+      <Toaster richColors />
+    </SidebarProvider >
   )
 }
