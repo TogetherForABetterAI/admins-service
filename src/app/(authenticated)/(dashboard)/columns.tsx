@@ -5,7 +5,7 @@ import z from "zod";
 
 
 const UserColumns = z.object({
-    client_id: z.string().uuid(),
+    user_id: z.string().uuid(),
     email: z.string().email(),
     username: z.string().min(1),
     model_type: z.string().min(1),
@@ -15,9 +15,9 @@ const UserColumns = z.object({
 
 export type User = z.infer<typeof UserColumns>;
 
-export const columns: ColumnDef<User>[] = [
+export const userColumns: ColumnDef<User>[] = [
     {
-        accessorKey: "ID",
+        accessorKey: "user_id",
         header: "ID",
     },
     {
@@ -39,10 +39,6 @@ export const columns: ColumnDef<User>[] = [
     {
         accessorKey: "outputs_format",
         header: "Outputs Format",
-    },
-    {
-        accessorKey: "token",
-        header: "Token",
     },
     {
         accessorKey: "created_at",

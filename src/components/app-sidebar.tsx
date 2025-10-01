@@ -26,12 +26,11 @@ import {
 } from "@/components/ui/alert-dialog"
 
 
-import { Search, Settings, UserRoundPlus, User, Plus, House, Database } from "lucide-react"
+import { KeyRound, UserRoundPlus, User, Plus, House, Database } from "lucide-react"
 import { usePathname } from "next/navigation";
 
 import { ReactNode, useState } from "react";
 import { Button } from "./ui/button";
-import { is } from "zod/v4/locales";
 import { toast, Toaster } from "sonner";
 
 const items = [
@@ -44,6 +43,11 @@ const items = [
     title: "New User",
     url: "/new-user",
     icon: Plus,
+  },
+  {
+    title: "New token",
+    url: "/new-token",
+    icon: KeyRound,
   },
   {
     title: "Grant Access",

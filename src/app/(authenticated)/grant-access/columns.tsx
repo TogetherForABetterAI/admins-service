@@ -10,7 +10,7 @@ const AdminColumns = z.object({
 
 export type Admin = z.infer<typeof AdminColumns>;
 
-export const columns: ColumnDef<Admin>[] = [
+export const adminColumns: ColumnDef<Admin>[] = [
     {
         accessorKey: "email",
         header: "Email",
