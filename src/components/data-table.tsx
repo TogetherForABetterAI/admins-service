@@ -16,41 +16,11 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import React from "react"
-import { UserType } from "@/lib/table-data-type";
-import { useEffect, useState } from "react";
-import { userColumns } from "@/app/(authenticated)/(dashboard)/columns";
-import { adminColumns } from "@/app/(authenticated)/grant-access/columns";
-import { tokenColumns } from "@/app/(authenticated)/new-token/columns";
 import { Loader2 } from "lucide-react";
 
 export function DataTable<TData, TValue>(
-  { type }: { type: UserType }
+  { data, columns, isLoading }: { data: TData[]; columns: ColumnDef<TData, TValue>[]; isLoading: boolean }
 ) {
-
-  const [data, setData] = useState<unknown[]>([]);
-  const [loading, setLoading] = useState(true);
-  const columns: ColumnDef<any, any>[] = (type === "users" ? userColumns : type === "admins" ? adminColumns : tokenColumns) as ColumnDef<any, any>[];
-
-  useEffect(() => {
-    setLoading(true);
-    fetch(`/api/${type}/get`, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("Fetched data:", data);
-        setData(data);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-        setData([]);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [type]);
-
 
   const table = useReactTable<any>({
     data,
@@ -58,9 +28,7 @@ export function DataTable<TData, TValue>(
     getCoreRowModel: getCoreRowModel(),
   })
 
-
-
-  if (loading) {
+  if (isLoading) {
     return <div className="p-16"><Loader2 className="mr-2 h-4 w-4 animate-spin" /></div>;
   }
 
