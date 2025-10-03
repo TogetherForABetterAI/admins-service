@@ -16,8 +16,9 @@ import { useRouter } from "next/dist/client/components/navigation";
 import { Loader2 } from "lucide-react";
 import { Toaster } from "@/components/ui/sonner"
 import { toast } from "sonner"
+import { signIn } from "@/lib/supabase";
 
-export function LogInCard() {
+export function LoginForm() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -37,18 +38,11 @@ export function LogInCard() {
     setError("");
 
     try {
-      const response = await fetch("/api/admins/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password })
-      });
-
-      console.log("response", response);
-      if (!response.ok) {
+      const user = await signIn(email, password);
+      if (!user) {
         setError("Email o contraseña incorrectos");
         return;
       }
-
       router.replace("/");
     } catch (err) {
       console.error("Error en login:", err);

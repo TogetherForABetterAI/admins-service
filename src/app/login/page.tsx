@@ -1,6 +1,6 @@
 
 import DarkModeToggle from "@/components/dark-mode-toggle";
-import { LogInCard } from "@/components/login-card";
+import { LoginForm } from "@/components/forms/login-form";
 import Logo from "@/components/logo";
 
 export default function LoginPage() {
@@ -11,7 +11,7 @@ export default function LoginPage() {
       </div>
       <div className="flex flex-col items-center justify-center p-4">
         <Logo />
-        <LogInCard />
+        <LoginForm />
       </div>
     </div>
   );

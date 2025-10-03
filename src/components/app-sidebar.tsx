@@ -29,9 +29,10 @@ import {
 import { KeyRound, UserRoundPlus, User, Plus, House, Database } from "lucide-react"
 import { usePathname } from "next/navigation";
 
-import { ReactNode, useState } from "react";
+import { ReactNode } from "react";
 import { Button } from "./ui/button";
 import { toast, Toaster } from "sonner";
+import { signOut } from "@/lib/supabase";
 
 const items = [
   {
@@ -67,15 +68,14 @@ export function AppSidebar({ children, email }: { children: ReactNode, email?: s
   const pathname = usePathname();
   console.log("Current pathname:", pathname);
 
-  const logout = () => {
-    fetch("/api/admins/logout", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-    }).then(() => {
+  const logout = async () => {
+    try {
+      await signOut();
       window.location.href = "/login";
-    }).catch((err) => {
+    } catch (error) {
+      console.error("Error logging out:", error);
       toast.error("Error logging out. Please try again.");
-    });
+    }
   }
 
   return (
