@@ -80,9 +80,8 @@ export function TokenForm() {
   }
 
   return (
-    < div className="flex justify-center align-center p-16" >
-      <Card className="p-8">
-
+    <div style={{ paddingBottom: "calc(var(--spacing) * 8)" }}>
+      <Card className="p-4" style={{ width: "fit-content" }}>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
@@ -90,10 +89,10 @@ export function TokenForm() {
               name="id"
               render={({ field }) => (
                 <FormItem>
-                  <div className="flex gap-4" style={{ minWidth: "400px" }}>
+                  <div className="flex gap-4" >
 
                     <FormControl>
-                      <Input {...field} placeholder="User ID" value={field.value || ""} />
+                      <Input {...field} placeholder="User ID" value={field.value || ""} className="w-80" />
                     </FormControl>
                     <div className="flex justify-end">
                       <Button type="submit" style={{ minWidth: "80px" }} disabled={loading}>

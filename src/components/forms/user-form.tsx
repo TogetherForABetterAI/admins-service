@@ -103,98 +103,94 @@ export default function UserForm() {
 
 
   return (
-    <>
-      <div className="p-8">
-        <h1 className="text-2xl font-bold">Register New User</h1>
-        <p className="text-muted-foreground">Enter the details of the new user you want to create.</p>
-      </div>
-      <div className="flex justify-center align-center p-16">
-        <Card className="w-full">
-          <CardHeader>
-            <CardTitle>Create New User</CardTitle>
-            <CardDescription>
-              Fill in the details below to create a new user account.
-            </CardDescription>
-          </CardHeader>
 
-          <CardContent>
-            <Form {...form}>
+    <div className="flex justify-center align-center p-16 w-64">
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>Create New User</CardTitle>
+          <CardDescription>
+            Fill in the details below to create a new user account.
+          </CardDescription>
+        </CardHeader>
 
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="flex flex-col gap-4"
-              >
-                <FormField control={form.control} name="email" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Email" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                <FormField control={form.control} name="username" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Username</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Username" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                <FormField control={form.control} name="model_type" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Model Type</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="MNIST or ACDC" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="MNIST">MNIST</SelectItem>
-                        <SelectItem value="ACDC">ACDC</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FormItem>
-                )} />
-                <FormField control={form.control} name="inputs_format" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Inputs Format</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g. (28, 28, 1) for MNIST" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                <FormField control={form.control} name="outputs_format" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Outputs Format</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g. (10,) for MNIST" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
+        <CardContent>
+          <Form {...form}>
 
-                {form.formState.errors.root && (
-                  <p style={{ color: "red" }} className="text-sm">
-                    {form.formState.errors.root.message}
-                  </p>
-                )}
-                <CardFooter className="flex-col gap-2 p-0 pt-4">
-                  <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    ) : (
-                      "Create"
-                    )}
-                  </Button>
-                </CardFooter>
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
-        <Toaster richColors />
-      </div>
-    </>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="flex flex-col gap-4"
+            >
+              <FormField control={form.control} name="email" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Email" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+              <FormField control={form.control} name="username" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Username</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Username" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+              <FormField control={form.control} name="model_type" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Model Type</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="MNIST or ACDC" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="MNIST">MNIST</SelectItem>
+                      <SelectItem value="ACDC">ACDC</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+              )} />
+              <FormField control={form.control} name="inputs_format" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Inputs Format</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g. (28, 28, 1) for MNIST" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+              <FormField control={form.control} name="outputs_format" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Outputs Format</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g. (10,) for MNIST" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+
+              {form.formState.errors.root && (
+                <p style={{ color: "red" }} className="text-sm">
+                  {form.formState.errors.root.message}
+                </p>
+              )}
+              <CardFooter className="flex-col gap-2 p-0 pt-4">
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    "Create"
+                  )}
+                </Button>
+              </CardFooter>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+      <Toaster richColors />
+    </div>
+
   );
 }

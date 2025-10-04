@@ -51,7 +51,7 @@ const items = [
     icon: KeyRound,
   },
   {
-    title: "Grant Access",
+    title: "Grant Access to Admins",
     url: "/grant-access",
     icon: UserRoundPlus,
   },
@@ -128,7 +128,7 @@ export function AppSidebar({ children, email }: { children: ReactNode, email?: s
         </SidebarContent>
         <SidebarFooter />
       </Sidebar>
-      <main className="w-full">
+      <main>
         <SidebarTrigger />
         {children}
       </main>

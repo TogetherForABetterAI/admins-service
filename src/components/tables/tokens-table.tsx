@@ -5,8 +5,12 @@ import { useQuery } from "@tanstack/react-query";
 import { DataTable } from "@/components/data-table";
 import { UserType } from "@/lib/table-data-type";
 import { TokenForm } from "../forms/token-form";
+import { useState } from "react";
+import { Loader2, Search } from "lucide-react";
+import { Input } from "../ui/input";
 
 export function TokensTable() {
+  const [search, setSearch] = useState("");
   const { data, isLoading } = useQuery<Token[]>({
     queryKey: [UserType.TOKENS],
     queryFn: () => apiFetch("/tokens/", {
@@ -15,16 +19,27 @@ export function TokensTable() {
     }),
   });
 
+
+
   return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold">Create Token</h1>
-      <div>
-        <p className="text-muted-foreground">Here you can see user tokens information</p>
-        <DataTable data={data ?? []} columns={tokenColumns} isLoading={isLoading} />
-      </div>
+    <>
       <TokenForm />
-    </div>
-
-
+      {isLoading ? (
+        <div className="p-16" > <Loader2 className="mr-2 h-4 w-4 animate-spin" /></div>
+      ) : (
+        <>
+          <div className="relative flex items-center pb-4">
+            <Search className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Input
+              className="pl-8 w-96"
+              placeholder="Search by user ID..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+          <DataTable data={data?.filter(token => token.user_id.includes(search)) ?? []} columns={tokenColumns} />
+        </>
+      )}
+    </>
   );
 }

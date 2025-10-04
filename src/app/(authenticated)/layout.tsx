@@ -17,7 +17,9 @@ export default async function RootLayout({
     return (
         <div className="flex">
             <AppSidebar email={email}>
-                {children}
+                <div className="p-8">
+                    {children}
+                </div>
             </AppSidebar>
             <div className="flex-1 p-4 flex justify-end">
                 <DarkModeToggle />

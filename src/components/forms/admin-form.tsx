@@ -81,9 +81,8 @@ export function AdminForm() {
   });
 
   return (
-    <div className="flex justify-center align-center p-16">
-      <Card className="p-16">
-
+    <div style={{ paddingBottom: "calc(var(--spacing) * 8)" }}>
+      <Card className="p-4" style={{ width: "fit-content" }}>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
@@ -92,9 +91,8 @@ export function AdminForm() {
               render={({ field }) => (
                 <FormItem>
                   <div className="flex gap-4">
-
                     <FormControl>
-                      <Input placeholder="admin@inti.com" {...field} value={field.value || ""} />
+                      <Input placeholder="admin@inti.com" {...field} value={field.value || ""} className="w-80" />
                     </FormControl>
                     <div className="flex justify-end">
                       <Button type="submit" style={{ minWidth: "80px" }} disabled={loading}>
@@ -103,7 +101,6 @@ export function AdminForm() {
 
                     </div>
                   </div>
-
                   <FormMessage />
                 </FormItem>
               )}

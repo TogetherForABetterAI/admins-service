@@ -7,13 +7,10 @@ export default async function Home() {
 
 
   return (
-    <div className="p-8" >
+    <QueryClientProviderWrapper>
       <h1 className="text-2xl font-bold">Manage user info</h1>
-      <p className="text-muted-foreground">Here you can see users information</p>
-      <QueryClientProviderWrapper>
-        <UsersTable />
-      </QueryClientProviderWrapper>
-    </div >
-
+      <p className="text-muted-foreground" style={{ paddingBottom: "calc(var(--spacing) * 16)" }}>Here you can see users information</p>
+      <UsersTable />
+    </QueryClientProviderWrapper>
   );
 }
