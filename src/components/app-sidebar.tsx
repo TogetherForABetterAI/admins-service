@@ -94,7 +94,7 @@ export function AppSidebar({ children, email, mlflow_url }: { children: ReactNod
                   return (
                     <SidebarMenuItem key={item.title} style={{ backgroundColor: isActive ? "#e0e0e0ff" : "transparent", borderRadius: "8px" }}>
                       <SidebarMenuButton asChild>
-                        <a href={item.url} className="flex items-center gap-2">
+                        <a href={item.url} className="flex items-center gap-2" target={item.title === "MLflow" ? "_blank" : "_self"} rel={item.title === "MLflow" ? "noopener noreferrer" : ""}>
                           <item.icon />
                           <span>{item.title}</span>
                         </a>

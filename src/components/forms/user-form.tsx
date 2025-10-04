@@ -104,7 +104,7 @@ export default function UserForm() {
 
   return (
 
-    <div className="flex justify-center align-center p-16 w-64">
+    <div className="flex justify-center align-center p-16">
       <Card className="w-full">
         <CardHeader>
           <CardTitle>Create New User</CardTitle>

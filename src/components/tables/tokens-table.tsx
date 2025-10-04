@@ -29,7 +29,7 @@ export function TokensTable() {
       ) : (
         <>
           <div className="relative flex items-center pb-4">
-            <Search className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Search className="absolute left-2 text-gray-400 w-4 h-4" />
             <Input
               className="pl-8 w-96"
               placeholder="Search by user ID..."
