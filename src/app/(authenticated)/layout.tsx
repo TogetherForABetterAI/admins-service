@@ -16,7 +16,7 @@ export default async function RootLayout({
 
     return (
         <div className="flex">
-            <AppSidebar email={email}>
+            <AppSidebar email={email} mlflow_url={process.env.MLFLOW_TRACKING_URI}>
                 <div className="p-8">
                     {children}
                 </div>

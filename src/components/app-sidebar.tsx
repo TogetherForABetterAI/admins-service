@@ -34,37 +34,36 @@ import { Button } from "./ui/button";
 import { toast, Toaster } from "sonner";
 import { signOut } from "@/lib/supabase";
 
-const items = [
-  {
-    title: "Dashboard",
-    url: "/",
-    icon: House,
-  },
-  {
-    title: "New User",
-    url: "/new-user",
-    icon: Plus,
-  },
-  {
-    title: "New token",
-    url: "/new-token",
-    icon: KeyRound,
-  },
-  {
-    title: "Grant Access to Admins",
-    url: "/grant-access",
-    icon: UserRoundPlus,
-  },
-  {
-    title: "MLflow",
-    url: "/mlflow",
-    icon: Database,
-  },
-]
 
 
-
-export function AppSidebar({ children, email }: { children: ReactNode, email?: string }) {
+export function AppSidebar({ children, email, mlflow_url }: { children: ReactNode, email?: string, mlflow_url?: string }) {
+  const items = [
+    {
+      title: "Dashboard",
+      url: "/",
+      icon: House,
+    },
+    {
+      title: "New User",
+      url: "/new-user",
+      icon: Plus,
+    },
+    {
+      title: "New token",
+      url: "/new-token",
+      icon: KeyRound,
+    },
+    {
+      title: "Grant Access to Admins",
+      url: "/grant-access",
+      icon: UserRoundPlus,
+    },
+    {
+      title: "MLflow",
+      url: mlflow_url,
+      icon: Database,
+    },
+  ]
   const pathname = usePathname();
   console.log("Current pathname:", pathname);
 
