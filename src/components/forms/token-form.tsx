@@ -26,22 +26,32 @@ import z from "zod";
 import { UserType } from "@/lib/table-data-type";
 
 const FormSchema = z.object({
-  id: z.string().uuid("ID must be a valid UUID."),
+  username: z.string().min(1, "Username is required"),
 })
 
 type ApiError = { status: number; message: string };
 
 const errorMessages: Record<number, string> = {
-  404: "Invalid user id.",
-  500: "Server error. Please try again later.",
+  404: "Invalid username",
+  500: "Server error. Please try again later",
 };
 
-async function createToken({ id }: { id: string }) {
-  return apiFetch("/tokens/create", {
+export async function createToken(data: z.infer<typeof FormSchema>) {
+  const response = await fetch("/api/tokens", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ user_id: id }),
+    body: JSON.stringify(data),
   });
+
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({}));
+    throw {
+      status: response.status,
+      message: body.message || "Unexpected error",
+    } satisfies ApiError;
+  }
+
+  return response.json();
 }
 
 export function TokenForm() {
@@ -51,7 +61,7 @@ export function TokenForm() {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      id: "",
+      username: "",
     }
   });
 
@@ -60,20 +70,21 @@ export function TokenForm() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [UserType.TOKENS] });
     },
+    onError: (error: ApiError) => {
+      const message = errorMessages[error.status] || error.message || "Failed to create token. Please try again.";
+
+      form.setError("username", { message });
+      toast.error(message);
+    }
   });
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     setLoading(true);
     try {
       await mutateAsync(data);
-      toast.success("Token created successfully for user with ID: " + data.id);
       form.reset();
     } catch (err) {
-      const error = err as ApiError;
-      console.error("Error creating token:", error);
-      const message = errorMessages[error.status] || error.message || "Failed to create token. Please try again.";
-      form.setError("root", { type: "manual", message });
-      toast.error(message);
+      console.log("Error while fetching tokens:", err);
     } finally {
       setLoading(false);
     }
@@ -86,13 +97,13 @@ export function TokenForm() {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
               control={form.control}
-              name="id"
+              name="username"
               render={({ field }) => (
                 <FormItem>
                   <div className="flex gap-4" >
 
                     <FormControl>
-                      <Input {...field} placeholder="User ID" value={field.value || ""} className="w-80" />
+                      <Input {...field} placeholder="Username" value={field.value || ""} className="w-80" />
                     </FormControl>
                     <div className="flex justify-end">
                       <Button type="submit" style={{ minWidth: "80px" }} disabled={loading}>

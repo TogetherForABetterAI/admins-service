@@ -16,7 +16,6 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import React from "react"
-import { Loader2 } from "lucide-react";
 
 export function DataTable<TData, TValue>(
   { data, columns }:
@@ -56,7 +55,6 @@ export function DataTable<TData, TValue>(
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
-                style={{ maxWidth: "50px" }}
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>

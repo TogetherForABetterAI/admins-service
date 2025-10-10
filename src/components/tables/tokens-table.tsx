@@ -32,12 +32,12 @@ export function TokensTable() {
             <Search className="absolute left-2 text-gray-400 w-4 h-4" />
             <Input
               className="pl-8 w-96"
-              placeholder="Search by user ID..."
+              placeholder="Search by username..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-          <DataTable data={data?.filter(token => token.user_id.includes(search)) ?? []} columns={tokenColumns} />
+          <DataTable data={data?.filter(token => token.username.includes(search)) ?? []} columns={tokenColumns} />
         </>
       )}
     </>

@@ -7,10 +7,8 @@ export default function NewUserPage() {
 
   return (
     <QueryClientProviderWrapper>
-      <div className="p-8">
-        <h1 className="text-2xl font-bold">Register New User</h1>
-        <p className="text-muted-foreground">Enter the details of the new user you want to create.</p>
-      </div>
+      <h1 className="text-2xl font-bold">Register New User</h1>
+      <p className="text-muted-foreground">Enter the details of the new user you want to create.</p>
       <UserForm />
     </QueryClientProviderWrapper>
   );

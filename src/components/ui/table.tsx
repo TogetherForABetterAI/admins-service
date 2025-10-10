@@ -73,7 +73,6 @@ function TableHead({ className, ...props }: React.ComponentProps<"th">) {
         "text-foreground h-10 px-2 text-left align-middle font-medium whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
         className
       )}
-      style={{ width: "50px" }}
       {...props}
     />
   )
@@ -87,8 +86,6 @@ function TableCell({ className, ...props }: React.ComponentProps<"td">) {
         "p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
         className
       )}
-      style={{ width: "50px" }}
-
       {...props}
     />
   )

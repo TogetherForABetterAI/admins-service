@@ -13,30 +13,15 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
-
-
 import { KeyRound, UserRoundPlus, User, Plus, House, Database } from "lucide-react"
 import { usePathname } from "next/navigation";
 
 import { ReactNode } from "react";
-import { Button } from "./ui/button";
 import { toast, Toaster } from "sonner";
-import { signOut } from "@/lib/supabase";
 
 
 
-export function AppSidebar({ children, email, mlflow_url }: { children: ReactNode, email?: string, mlflow_url?: string }) {
+export function AppSidebar({ children, mlflow_url }: { children: ReactNode, mlflow_url?: string }) {
   const items = [
     {
       title: "Dashboard",
@@ -67,23 +52,9 @@ export function AppSidebar({ children, email, mlflow_url }: { children: ReactNod
   const pathname = usePathname();
   console.log("Current pathname:", pathname);
 
-  const logout = async () => {
-    try {
-      await signOut();
-      window.location.href = "/login";
-    } catch (error) {
-      console.error("Error logging out:", error);
-      toast.error("Error logging out. Please try again.");
-    }
-  }
-
   return (
     <SidebarProvider>
       <Sidebar>
-        <SidebarHeader>
-          <User />
-          <span className="font-bold">{email}</span>
-        </SidebarHeader>
         <SidebarContent>
           <SidebarGroup>
             <SidebarGroupContent>
@@ -106,29 +77,10 @@ export function AppSidebar({ children, email, mlflow_url }: { children: ReactNod
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
-
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button>Logout</Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Are you sure you want to logout?</AlertDialogTitle>
-              </AlertDialogHeader>
-              <AlertDialogDescription>
-              </AlertDialogDescription>
-              <AlertDialogFooter>
-                <AlertDialogCancel>No</AlertDialogCancel>
-                <AlertDialogAction onClick={logout}>Yes</AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-
         </SidebarContent>
         <SidebarFooter />
       </Sidebar>
       <main>
-        <SidebarTrigger />
         {children}
       </main>
       <Toaster richColors />
