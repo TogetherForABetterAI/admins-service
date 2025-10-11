@@ -28,7 +28,7 @@ import { toast } from "sonner"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { UserType } from "@/lib/table-data-type";
 import { create } from "domain";
-import { apiFetch } from "@/external/api";
+import { ApiError, apiFetch } from "@/external/api";
 
 const UserFormSchema = z.object({
   username: z.string().min(1, "Username is required"),
@@ -40,8 +40,6 @@ const UserFormSchema = z.object({
 
 type UserCredentials = z.infer<typeof UserFormSchema>;
 
-
-type ApiError = { status: number; message: string };
 
 const errorMessages: Record<number, string> = {
   409: "Email or username already exists",
@@ -66,10 +64,22 @@ export default function UserForm() {
     mutationFn: createUser,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [UserType.USERS] });
+      toast.success("User created successfully");
     },
     onError: (error: ApiError) => {
-      const message = errorMessages[error.status] || error.message || "Failed to create user";
+      const statusCode = Number(error.message);
+      const message =
+        !isNaN(statusCode) && errorMessages[statusCode]
+          ? errorMessages[statusCode]
+          : "Failed to create token";
+
       toast.error(message);
+      form.setError("root", { message });
+
+      if (isNaN(statusCode)) {
+        console.error("Error while handling API error:", error);
+      }
+
     },
   });
 
@@ -91,11 +101,7 @@ export default function UserForm() {
       toast.success("User created successfully");
       form.reset();
     } catch (err) {
-      const error = err as ApiError;
-      console.error("Error creating user:", error);
-      const message = errorMessages[error.status] || error.message || "Failed to create user";
-      form.setError("root", { type: "manual", message });
-      toast.error(message);
+      console.error("Error creating user:", err);
     } finally {
       setLoading(false);
     }

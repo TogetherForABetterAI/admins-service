@@ -3,7 +3,7 @@
 
 "use client"
 import { Token, tokenColumns } from "@/app/(authenticated)/new-token/columns";
-import { apiFetch } from "@/external/api";
+import { ApiError, apiFetch } from "@/external/api";
 import { QueryClient, QueryClientProvider, useMutation, useQuery } from "@tanstack/react-query";
 import { DataTable } from "@/components/data-table";
 import { Button } from "@/components/ui/button";
@@ -29,29 +29,17 @@ const FormSchema = z.object({
   username: z.string().min(1, "Username is required"),
 })
 
-type ApiError = { status: number; message: string };
-
 const errorMessages: Record<number, string> = {
   404: "Invalid username",
   500: "Server error. Please try again later",
 };
 
 export async function createToken(data: z.infer<typeof FormSchema>) {
-  const response = await fetch("/api/tokens", {
+  return apiFetch("/tokens/create", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-
-  if (!response.ok) {
-    const body = await response.json().catch(() => ({}));
-    throw {
-      status: response.status,
-      message: body.message || "Unexpected error",
-    } satisfies ApiError;
-  }
-
-  return response.json();
 }
 
 export function TokenForm() {
@@ -69,13 +57,23 @@ export function TokenForm() {
     mutationFn: (data: z.infer<typeof FormSchema>) => createToken(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [UserType.TOKENS] });
+      toast.success("Token created successfully");
     },
-    onError: (error: ApiError) => {
-      const message = errorMessages[error.status] || error.message || "Failed to create token. Please try again.";
+    onError: (error: any) => {
+      const statusCode = Number(error.message);
+      const message =
+        !isNaN(statusCode) && errorMessages[statusCode]
+          ? errorMessages[statusCode]
+          : "Failed to create token";
 
-      form.setError("username", { message });
       toast.error(message);
-    }
+      form.setError("username", { message });
+
+      if (isNaN(statusCode)) {
+        console.error("Error while handling API error:", error);
+      }
+
+    },
   });
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {

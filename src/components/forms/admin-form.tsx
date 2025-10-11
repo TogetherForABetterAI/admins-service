@@ -54,6 +54,26 @@ export function AdminForm() {
       email: "",
     }
   });
+  const { mutateAsync } = useMutation({
+    mutationFn: (data: z.infer<typeof FormSchema>) => inviteAdmin(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [UserType.ADMINS] });
+    },
+    onError: (error) => {
+      const statusCode = Number(error.message);
+      const message =
+        !isNaN(statusCode) && errorMessages[statusCode]
+          ? errorMessages[statusCode]
+          : "Failed to create token";
+
+      toast.error(message);
+      form.setError("root", { message });
+
+      if (isNaN(statusCode)) {
+        console.error("Error while handling API error:", error);
+      }
+    },
+  });
 
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
@@ -63,22 +83,12 @@ export function AdminForm() {
       toast.success("Invite sent successfully to " + data.email);
       form.reset();
     } catch (err) {
-      const error = err as ApiError;
-      console.error("Error granting admin permissions:", error);
-      const message = errorMessages[error.status] || error.message || "Failed to grant admin permissions";
-      form.setError("root", { type: "manual", message });
-      toast.error(message);
+      console.error("Error granting admin permissions:", err);
     } finally {
       setLoading(false);
     }
   }
 
-  const { mutateAsync } = useMutation({
-    mutationFn: (data: z.infer<typeof FormSchema>) => inviteAdmin(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [UserType.ADMINS] });
-    }
-  });
 
   return (
     <div style={{ paddingBottom: "calc(var(--spacing) * 8)" }}>
