@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -8,14 +8,14 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { useRouter } from "next/dist/client/components/navigation";
 import { Loader2 } from "lucide-react";
-import { Toaster } from "@/components/ui/sonner"
-import { toast } from "sonner"
+import { Toaster } from "@/components/ui/sonner";
+import { toast } from "sonner";
 import { signIn } from "@/lib/supabase";
 
 export function LoginForm() {
@@ -27,7 +27,6 @@ export function LoginForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Logueando con:", email, password);
 
     if (!email || !password) {
       setError("Debes ingresar tu email y contraseña");
@@ -39,19 +38,29 @@ export function LoginForm() {
 
     try {
       const user = await signIn(email, password);
+
       if (!user) {
         setError("Email o contraseña incorrectos");
         return;
       }
+
       router.replace("/");
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error en login:", err);
-      setError("No se pudo conectar con el servidor. Intenta más tarde.");
+
+      if (err.message === "CREDENCIALES_INVALIDAS") {
+        setError("Email o contraseña incorrectos");
+      } else if (err.message === "ERROR_AUTENTICACION") {
+        setError(
+          "Hubo un problema al intentar autenticarte. Intenta más tarde."
+        );
+      } else {
+        setError("Ocurrió un error inesperado. Por favor, intenta nuevamente.");
+      }
     } finally {
       setLoading(false);
     }
   };
-
 
   if (error) {
     toast.error(error);
@@ -94,17 +103,27 @@ export function LoginForm() {
                   Forgot your password?
                 </a>
               </div>
-              <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+              <Input
+                id="password"
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
             </div>
           </div>
         </form>
       </CardContent>
       <CardFooter className="flex-col gap-2">
         <Button type="submit" className="w-full" onClick={handleSubmit}>
-          {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Login"}
+          {loading ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            "Login"
+          )}
         </Button>
       </CardFooter>
       <Toaster richColors />
     </Card>
-  )
+  );
 }
