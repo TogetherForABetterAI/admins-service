@@ -1,8 +1,11 @@
 "use client";
 
-import { DataTable } from "@/components/data-table"
+import { DataTable } from "@/components/data-table";
 import { UserType } from "@/lib/table-data-type";
-import { Admin, adminColumns } from "@/app/(authenticated)/grant-access/columns";
+import {
+  Admin,
+  adminColumns,
+} from "@/app/(authenticated)/grant-access/columns";
 import { useQuery } from "@tanstack/react-query";
 import { AdminForm } from "../forms/admin-form";
 import { Loader2, Search } from "lucide-react";
@@ -14,17 +17,22 @@ export default function InputForm() {
   const [search, setSearch] = useState("");
   const { data, isLoading } = useQuery<Admin[]>({
     queryKey: [UserType.ADMINS],
-    queryFn: () => apiFetch("/admins/", {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    }),
+    queryFn: () =>
+      apiFetch("/admins/", {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      }),
   });
+
+  console.log("Admins data:", data);
 
   return (
     <>
       <AdminForm />
       {isLoading ? (
-        <div className="p-16"><Loader2 className="mr-2 h-4 w-4 animate-spin" /></div>
+        <div className="p-16">
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+        </div>
       ) : (
         <>
           <div className="relative flex items-center pb-4">
@@ -36,11 +44,12 @@ export default function InputForm() {
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-          <DataTable data={data?.filter(admin => admin.email.includes(search)) ?? []} columns={adminColumns} />
+          <DataTable
+            data={data?.filter((admin) => admin.email.includes(search)) ?? []}
+            columns={adminColumns}
+          />
         </>
       )}
     </>
-  )
+  );
 }
-
-

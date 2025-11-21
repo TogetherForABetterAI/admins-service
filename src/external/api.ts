@@ -1,32 +1,31 @@
-"use server"
-import { createClient } from "@/lib/supabase"
+"use server";
+import { createClient } from "@/lib/supabase";
 
 export type ApiError = { status: number; message: string };
-
 
 export async function apiFetch<T>(
   path: string,
   options: RequestInit = {}
 ): Promise<T> {
+  const supabase = await createClient();
+  const { data } = await supabase.auth.getSession();
+  const token = data.session?.access_token;
 
-  const supabase = await createClient()
-  const { data } = await supabase.auth.getSession()
-  const token = data.session?.access_token
-
-  const headers = new Headers(options.headers || {})
+  const headers = new Headers(options.headers || {});
   if (token) {
-    headers.set("Authorization", `Bearer ${token}`)
+    headers.set("Authorization", `Bearer ${token}`);
   }
-  headers.set("Content-Type", "application/json")
-  console.log("Fetching:", `${process.env.API_GATEWAY_URL}${path}`)
+  headers.set("Content-Type", "application/json");
+  console.log("Fetching:", `${process.env.API_GATEWAY_URL}${path}`);
   const res = await fetch(`${process.env.API_GATEWAY_URL}${path}`, {
     ...options,
     headers,
-  })
+  });
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
-    const message = (body as any)?.message ?? res.statusText ?? String(res.status);
+    const message =
+      (body as any)?.message ?? res.statusText ?? String(res.status);
     const error = new Error(message);
     // Unicamente me deja acceder al status code a traves del message, los otros campos parecen no estar disponibles.
     // No es lo ideal, pero no encontre otra forma.
@@ -35,6 +34,4 @@ export async function apiFetch<T>(
     throw error;
   }
   return res.json();
-
 }
-
