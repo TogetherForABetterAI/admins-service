@@ -25,7 +25,7 @@ export default async function RootLayout({
           alt="INTI logo"
           width={20}
           height={20}
-          className="w-auto p-2"
+          className="w-auto p-4"
           priority
         />
         <div className="flex items-center gap-2">
