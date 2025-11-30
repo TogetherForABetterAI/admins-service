@@ -1,7 +1,6 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -9,17 +8,25 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { useState } from "react";
-import { useRouter } from "next/dist/client/components/navigation";
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Toaster } from "@/components/ui/sonner";
 import { Loader2 } from "lucide-react";
-import { Toaster } from "@/components/ui/sonner"
-import { toast } from "sonner"
-import { set } from "zod";
+import { useRouter } from "next/dist/client/components/navigation";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
+import { toast } from "sonner";
 
 export function SetPasswordCard() {
+  return (
+    <Suspense fallback={<div>Cargando...</div>}>
+      <SetPasswordCardContent />
+    </Suspense>
+  );
+}
+
+function SetPasswordCardContent() {
   const router = useRouter();
   const [password1, setPassword1] = useState("");
   const [password2, setPassword2] = useState("");
