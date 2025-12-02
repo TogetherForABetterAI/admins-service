@@ -1,5 +1,6 @@
 "use server";
 import { createClient } from "@/lib/supabase";
+import { redirect } from "next/navigation";
 
 export type ApiError = { status: number; message: string };
 
@@ -11,10 +12,13 @@ export async function apiFetch<T>(
   const { data } = await supabase.auth.getSession();
   const token = data.session?.access_token;
 
-  const headers = new Headers(options.headers || {});
-  if (token) {
-    headers.set("Authorization", `Bearer ${token}`);
+  if (!token) {
+    console.log("No token found - Redirecting to login");
+    redirect("/login");
   }
+
+  const headers = new Headers(options.headers || {});
+  headers.set("Authorization", `Bearer ${token}`);
   headers.set("Content-Type", "application/json");
 
   const apiGatewayUrl = process.env.API_GATEWAY_URL;
