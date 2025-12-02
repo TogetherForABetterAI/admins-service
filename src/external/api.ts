@@ -16,8 +16,8 @@ export async function apiFetch<T>(
     headers.set("Authorization", `Bearer ${token}`);
   }
   headers.set("Content-Type", "application/json");
-  console.log("Fetching:", `${process.env.API_GATEWAY_URL}${path}`);
-  const res = await fetch(`${process.env.API_GATEWAY_URL}${path}`, {
+  console.log("Fetching:", `${process.env.USERS_SERVICE_URL}${path}`);
+  const res = await fetch(`${process.env.USERS_SERVICE_URL}${path}`, {
     ...options,
     headers,
   });

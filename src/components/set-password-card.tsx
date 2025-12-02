@@ -21,9 +21,14 @@ export function SetPasswordCard() {
   const [loading, setLoading] = useState(false)
   const [showPassword1, setShowPassword1] = useState(false)
   const [showPassword2, setShowPassword2] = useState(false)
+  const [touched1, setTouched1] = useState(false)
+  const [touched2, setTouched2] = useState(false)
 
   const searchParams = useSearchParams()
   const email = searchParams.get("email")
+
+  const password1TooShort = touched1 && password1.length > 0 && password1.length < 8
+  const passwordsMismatch = touched2 && password2.length > 0 && password1 !== password2
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -31,6 +36,11 @@ export function SetPasswordCard() {
 
     if (!password1 || !password2) {
       setError("Debes ingresar tu nueva contraseña")
+      return
+    }
+
+    if (password1.length < 8) {
+      setError("La contraseña debe tener al menos 8 caracteres")
       return
     }
 
@@ -98,7 +108,8 @@ export function SetPasswordCard() {
                   required
                   value={password1}
                   onChange={(e) => setPassword1(e.target.value)}
-                  className="pr-10"
+                  onBlur={() => setTouched1(true)}
+                  className={`pr-10 ${password1TooShort ? "border-red-500 focus-visible:ring-red-500" : ""}`}
                 />
                 <button
                   type="button"
@@ -109,6 +120,9 @@ export function SetPasswordCard() {
                   {showPassword1 ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
+              {password1TooShort && (
+                <p className="text-sm text-red-500">Password must be at least 8 characters long</p>
+              )}
             </div>
             <div className="grid gap-2">
               <div className="flex items-center">
@@ -122,7 +136,8 @@ export function SetPasswordCard() {
                   required
                   value={password2}
                   onChange={(e) => setPassword2(e.target.value)}
-                  className="pr-10"
+                  onBlur={() => setTouched2(true)}
+                  className={`pr-10 ${passwordsMismatch ? "border-red-500 focus-visible:ring-red-500" : ""}`}
                 />
                 <button
                   type="button"
@@ -133,6 +148,9 @@ export function SetPasswordCard() {
                   {showPassword2 ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
+              {passwordsMismatch && (
+                <p className="text-sm text-red-500">Passwords do not match</p>
+              )}
             </div>
           </div>
         </form>
