@@ -71,7 +71,7 @@ export default function UserForm() {
       const message =
         !isNaN(statusCode) && errorMessages[statusCode]
           ? errorMessages[statusCode]
-          : "Failed to create token";
+          : "Failed to create user";
 
       toast.error(message);
       form.setError("root", { message });
