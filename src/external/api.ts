@@ -17,11 +17,10 @@ export async function apiFetch<T>(
   }
   headers.set("Content-Type", "application/json");
 
-  const apiGatewayUrl = process.env.NEXT_PUBLIC_API_GATEWAY_URL;
+  const apiGatewayUrl = process.env.API_GATEWAY_URL;
   
   if (!apiGatewayUrl) {
-    // If the URL is missing, throw a clear error instead of defaulting to localhost
-    throw new Error("API_GATEWAY_URL environment variable is not configured correctly for the client.");
+    throw new Error("API_GATEWAY_URL environment variable is not configured.");
   }
   
   console.log("Fetching:", `${apiGatewayUrl}${path}`);
