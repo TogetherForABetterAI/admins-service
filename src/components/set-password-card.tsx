@@ -1,6 +1,6 @@
 "use client"
 
-import type React from "react"
+import React from "react"
 
 import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -52,8 +52,7 @@ export function SetPasswordCard() {
     setLoading(true)
 
     try {
-      const response = await fetch("http://localhost:80/admins/signup", {
-        method: "POST",
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_GATEWAY_URL}/admins/signup`, { method: "POST",
         headers: {
           "Content-Type": "application/json",
         },

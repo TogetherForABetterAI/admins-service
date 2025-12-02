@@ -16,8 +16,15 @@ export async function apiFetch<T>(
     headers.set("Authorization", `Bearer ${token}`);
   }
   headers.set("Content-Type", "application/json");
-  console.log("Fetching:", `${process.env.USERS_SERVICE_URL}${path}`);
-  const res = await fetch(`${process.env.USERS_SERVICE_URL}${path}`, {
+
+  const apiGatewayUrl = process.env.API_GATEWAY_URL;
+  
+  if (!apiGatewayUrl) {
+    throw new Error("API_GATEWAY_URL environment variable is not configured.");
+  }
+  
+  console.log("Fetching:", `${apiGatewayUrl}${path}`);
+  const res = await fetch(`${apiGatewayUrl}${path}`, {
     ...options,
     headers,
   });
@@ -27,8 +34,6 @@ export async function apiFetch<T>(
     const message =
       (body as any)?.message ?? res.statusText ?? String(res.status);
     const error = new Error(message);
-    // Unicamente me deja acceder al status code a traves del message, los otros campos parecen no estar disponibles.
-    // No es lo ideal, pero no encontre otra forma.
     (error as any).status = res.status;
     (error as any).body = body;
     throw error;
