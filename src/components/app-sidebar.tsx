@@ -13,7 +13,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 
-import { KeyRound, UserRoundPlus, User, Plus, House, Database } from "lucide-react"
+import { KeyRound, UserRoundPlus, User, Plus, House, Database, FlaskConical } from "lucide-react"
 import { usePathname } from "next/navigation";
 
 import { ReactNode } from "react";
@@ -42,6 +42,11 @@ export function AppSidebar({ children, mlflow_url }: { children: ReactNode, mlfl
       title: "Grant Access to Admins",
       url: "/grant-access",
       icon: UserRoundPlus,
+    },
+    {
+      title: "Model Evaluations",
+      url: "/model-evaluations",
+      icon: FlaskConical,
     },
     {
       title: "MLflow",
