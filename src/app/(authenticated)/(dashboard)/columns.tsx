@@ -1,7 +1,6 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { create } from "domain";
 import z from "zod";
 
 const UserColumns = z.object({
@@ -12,6 +11,7 @@ const UserColumns = z.object({
   inputs_format: z.string().min(1),
   outputs_format: z.string().min(1),
   created_at: z.string().min(1),
+  is_authorized: z.boolean(),
 });
 
 export type User = z.infer<typeof UserColumns>;
@@ -44,5 +44,9 @@ export const userColumns: ColumnDef<User>[] = [
   {
     accessorKey: "created_at",
     header: "Created At",
+  },
+  {
+    accessorKey: "is_authorized",
+    header: "Authorized",
   },
 ];
