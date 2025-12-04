@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { DataTable } from "@/components/data-table";
 import { createRunColumns, MLflowRun } from "@/app/(authenticated)/model-evaluations/columns";
-import { Input } from "@/components/ui/input";
+import { ArtifactDrawer } from "@/components/artifact-drawer";
+import { DataTable } from "@/components/data-table";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -13,16 +12,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useQuery } from "@tanstack/react-query";
 import {
-  Loader2,
-  Search,
   AlertCircle,
-  RefreshCw,
   Database,
+  Loader2,
+  RefreshCw,
+  Search,
 } from "lucide-react";
-import { ArtifactDrawer } from "@/components/artifact-drawer";
+import { useCallback, useState } from "react";
 
-const MLFLOW_BASE_URL = process.env.NEXT_PUBLIC_MLFLOW_URL || "http://localhost:5009";
+const MLFLOW_BASE_URL = "/mlflow-proxy";
 
 interface MLflowRunsResponse {
   runs: Array<{

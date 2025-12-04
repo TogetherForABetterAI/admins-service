@@ -1,10 +1,10 @@
 
-import "@/styles/globals.css";
 import { AppSidebar } from "@/components/app-sidebar";
-import { createClient } from "@/lib/supabase";
-import Image from "next/image";
-import { User } from "lucide-react";
 import { LogOutButton } from "@/components/logout-button";
+import { createClient } from "@/lib/supabase";
+import "@/styles/globals.css";
+import { User } from "lucide-react";
+import Image from "next/image";
 
 
 
@@ -34,7 +34,7 @@ export default async function RootLayout({
           <LogOutButton />
         </div>
       </div>
-      <AppSidebar mlflow_url={process.env.MLFLOW_TRACKING_URI}>
+      <AppSidebar mlflow_url="/mlflow-proxy">
         <div className="p-8" style={{ paddingTop: "calc(var(--spacing) * 16)" }}>
           {children}
         </div>
