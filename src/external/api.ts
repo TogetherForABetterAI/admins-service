@@ -1,6 +1,5 @@
 "use server";
 import { createClient } from "@/lib/supabase";
-import { redirect } from "next/navigation";
 
 export type ApiError = { status: number; message: string };
 
@@ -13,8 +12,9 @@ export async function apiFetch<T>(
   const token = data.session?.access_token;
 
   if (!token) {
-    console.log("No token found - Redirecting to login");
-    redirect("/login");
+    const error = new Error("Unauthorized: No authentication token found");
+    (error as any).status = 401;
+    throw error;
   }
 
   const headers = new Headers(options.headers || {});
@@ -24,10 +24,9 @@ export async function apiFetch<T>(
   const apiGatewayUrl = process.env.API_GATEWAY_URL;
   
   if (!apiGatewayUrl) {
-    throw new Error("API_GATEWAY_URL environment variable is not configured.");
+    throw new Error("CRITICAL: API_GATEWAY_URL environment variable is not configured. Check your .env file.");
   }
   
-  console.log("Fetching:", `${apiGatewayUrl}${path}`);
   const res = await fetch(`${apiGatewayUrl}${path}`, {
     ...options,
     headers,
