@@ -8,9 +8,15 @@ export async function middleware(request: NextRequest) {
     },
   });
 
+  // Validar variables de entorno críticas
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    console.error("CRITICAL: Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY");
+    return new NextResponse("Service misconfigured", { status: 500 });
+  }
+
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     {
       cookies: {
         getAll() {
@@ -35,30 +41,43 @@ export async function middleware(request: NextRequest) {
 
   const { data: { session } } = await supabase.auth.getSession();
 
+  // Protección de rutas
   if (!user && !request.nextUrl.pathname.startsWith('/login') && !request.nextUrl.pathname.startsWith('/set-password')) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
   }
 
+  // Proxy para MLflow
   const isMlflowRequest = 
       request.nextUrl.pathname.startsWith('/mlflow-proxy') ||
       request.nextUrl.pathname.startsWith('/static-files') ||
       request.nextUrl.pathname.startsWith('/ajax-api');
 
   if (user && session && isMlflowRequest) {
-   
-    const targetBase = process.env.MLFLOW_TRACKING_URI || 'http://136.114.87.151/mlflow';
-    let subPath = request.nextUrl.pathname.replace('/mlflow-proxy', '');
+    const mlflowUri = process.env.MLFLOW_TRACKING_URI;
     
-    const targetUrl = new URL(targetBase + subPath);
+    if (!mlflowUri) {
+      console.error("CRITICAL: MLFLOW_TRACKING_URI not configured");
+      return new NextResponse("MLflow service not configured", { status: 503 });
+    }
     
-    // Copiar query params (?run_id=...)
+    // Quitar /mlflow-proxy del path
+    const subPath = request.nextUrl.pathname.replace('/mlflow-proxy', '');
+    const targetUrl = new URL(mlflowUri + subPath);
     targetUrl.search = request.nextUrl.search;
 
+    // Clonar headers y agregar autorización
     const requestHeaders = new Headers(request.headers);
+    
+    // Opción 1: Enviar como Authorization header (tu backend lo soporta)
     requestHeaders.set('Authorization', `Bearer ${session.access_token}`);
     
+    // Opción 2: También enviar como cookie (tu backend también lo soporta)
+    const existingCookie = request.cookies.get('access_token');
+    if (!existingCookie) {
+      requestHeaders.set('Cookie', `access_token=${session.access_token}`);
+    }
 
     return NextResponse.rewrite(targetUrl, {
       request: {
