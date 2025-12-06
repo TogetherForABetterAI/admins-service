@@ -11,7 +11,14 @@ export async function apiFetch<T>(
   const { data } = await supabase.auth.getSession();
   const token = data.session?.access_token;
 
+  console.log("[apiFetch] Request:", {
+    path,
+    hasToken: !!token,
+    method: options.method || 'GET',
+  });
+
   if (!token) {
+    console.error("[apiFetch] No token found");
     const error = new Error("Unauthorized: No authentication token found");
     (error as any).status = 401;
     throw error;
@@ -24,18 +31,29 @@ export async function apiFetch<T>(
   const apiGatewayUrl = process.env.API_GATEWAY_URL;
   
   if (!apiGatewayUrl) {
+    console.error("[apiFetch] API_GATEWAY_URL not configured");
     throw new Error("CRITICAL: API_GATEWAY_URL environment variable is not configured. Check your .env file.");
   }
   
-  const res = await fetch(`${apiGatewayUrl}${path}`, {
+  const fullUrl = `${apiGatewayUrl}${path}`;
+  console.log("[apiFetch] Fetching:", fullUrl);
+  
+  const res = await fetch(fullUrl, {
     ...options,
     headers,
+  });
+
+  console.log("[apiFetch] Response:", {
+    status: res.status,
+    ok: res.ok,
+    url: fullUrl,
   });
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     const message =
       (body as any)?.message ?? res.statusText ?? String(res.status);
+    console.error("[apiFetch] Error:", { status: res.status, message, body });
     const error = new Error(message);
     (error as any).status = res.status;
     (error as any).body = body;
