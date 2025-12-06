@@ -1,8 +1,8 @@
 "use client";
 
 import {
-  Admin,
-  adminColumns,
+    Admin,
+    adminColumns,
 } from "@/app/(authenticated)/grant-access/columns";
 import { DataTable } from "@/components/data-table";
 import { apiFetch } from "@/external/api";
