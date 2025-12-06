@@ -9,14 +9,14 @@ export default async function proxy(request: NextRequest) {
   });
 
   // Validar variables de entorno críticas
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-    console.error("CRITICAL: Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY");
+  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_PUBLISHABLE_KEY) {
+    console.error("CRITICAL: Missing SUPABASE_URL or SUPABASE_PUBLISHABLE_KEY");
     return new NextResponse("Service misconfigured", { status: 500 });
   }
 
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_PUBLISHABLE_KEY,
     {
       cookies: {
         getAll() {
