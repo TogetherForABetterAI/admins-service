@@ -41,8 +41,12 @@ export default async function proxy(request: NextRequest) {
 
   const { data: { session } } = await supabase.auth.getSession();
 
-  // Protección de rutas
-  if (!user && !request.nextUrl.pathname.startsWith('/login') && !request.nextUrl.pathname.startsWith('/set-password')) {
+  // NO interceptar Server Actions - estos manejan su propia autenticación
+  const isServerAction = request.headers.get('next-action') !== null;
+  const isApiRoute = request.nextUrl.pathname.startsWith('/api');
+  
+  // Protección de rutas - NO aplicar a Server Actions ni API routes
+  if (!isServerAction && !isApiRoute && !user && !request.nextUrl.pathname.startsWith('/login') && !request.nextUrl.pathname.startsWith('/set-password')) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
