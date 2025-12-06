@@ -1,35 +1,6 @@
 "use client";
 
 import { User } from "@/app/(authenticated)/(dashboard)/columns";
-import { ApiError, apiFetch } from "@/external/api";
-import {
-  QueryClient,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Toaster } from "@/components/ui/sonner";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Loader2,
-  Copy,
-  Check,
-  AlertTriangle,
-  KeyRound,
-  ShieldCheck,
-} from "lucide-react";
-import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -38,10 +9,38 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Combobox, ComboboxOption } from "@/components/ui/combobox";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Toaster } from "@/components/ui/sonner";
+import { apiFetch } from "@/external/api";
+import { UserType } from "@/lib/table-data-type";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  useMutation,
+  useQuery,
+  useQueryClient
+} from "@tanstack/react-query";
+import {
+  AlertTriangle,
+  Check,
+  Copy,
+  KeyRound,
+  Loader2,
+  ShieldCheck,
+} from "lucide-react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
-import { UserType } from "@/lib/table-data-type";
-import { Combobox, ComboboxOption } from "@/components/ui/combobox";
 
 const FormSchema = z.object({
   username: z.string().min(1, "Username is required"),
