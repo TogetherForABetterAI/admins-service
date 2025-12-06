@@ -14,11 +14,16 @@ export async function apiFetch<T>(
   console.log("[apiFetch] Request:", {
     path,
     hasToken: !!token,
+    tokenLength: token?.length || 0,
+    hasSession: !!data.session,
     method: options.method || 'GET',
   });
 
   if (!token) {
-    console.error("[apiFetch] No token found");
+    console.error("[apiFetch] No token found - session data:", {
+      hasSession: !!data.session,
+      sessionKeys: data.session ? Object.keys(data.session) : [],
+    });
     const error = new Error("Unauthorized: No authentication token found");
     (error as any).status = 401;
     throw error;
