@@ -1,13 +1,13 @@
 "use client";
 import { User, userColumns } from "@/app/(authenticated)/(dashboard)/columns";
+import { DataTable } from "@/components/data-table";
 import { apiFetch } from "@/external/api";
 import { UserType } from "@/lib/table-data-type";
+import { toShortTimestamp } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
-import { DataTable } from "@/components/data-table";
+import { Loader2, Search } from "lucide-react";
 import { useState } from "react";
 import { Input } from "../ui/input";
-import { Loader2, Search } from "lucide-react";
-import { toShortTimestamp } from "@/lib/utils";
 
 export function UsersTable() {
   const [search, setSearch] = useState("");
