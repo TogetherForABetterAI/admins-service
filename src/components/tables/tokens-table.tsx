@@ -15,7 +15,7 @@ export function TokensTable() {
   const { data, isLoading } = useQuery<Token[]>({
     queryKey: [UserType.TOKENS],
     queryFn: () =>
-      apiFetch("/tokens/", {
+      apiFetch("/tokens", {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       }),
