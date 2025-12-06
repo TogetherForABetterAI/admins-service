@@ -15,7 +15,7 @@ export function UsersTable() {
   const { data, isLoading } = useQuery<User[]>({
     queryKey: [UserType.USERS],
     queryFn: () =>
-      apiFetch("/users", {
+      apiFetch("/users/", {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       }),

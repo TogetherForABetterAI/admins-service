@@ -18,7 +18,7 @@ export default function InputForm() {
   const { data, isLoading } = useQuery<Admin[]>({
     queryKey: [UserType.ADMINS],
     queryFn: () =>
-      apiFetch("/admins", {
+      apiFetch("/admins/", {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       }),
