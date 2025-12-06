@@ -34,7 +34,7 @@ export default async function RootLayout({
           <LogOutButton />
         </div>
       </div>
-      <AppSidebar mlflow_url="/auth/mlflow">
+      <AppSidebar mlflow_url="/api/mlflow-redirect">
         <div className="p-8" style={{ paddingTop: "calc(var(--spacing) * 16)" }}>
           {children}
         </div>
