@@ -34,15 +34,15 @@ export async function apiFetch<T>(
   headers.set("Content-Type", "application/json");
 
   const apiGatewayUrl = process.env.API_GATEWAY_URL;
-  
+
   if (!apiGatewayUrl) {
     console.error("[apiFetch] API_GATEWAY_URL not configured");
     throw new Error("CRITICAL: API_GATEWAY_URL environment variable is not configured. Check your .env file.");
   }
-  
+
   const fullUrl = `${apiGatewayUrl}${path}`;
   console.log("[apiFetch] Fetching:", fullUrl);
-  
+
   const res = await fetch(fullUrl, {
     ...options,
     headers,
@@ -56,13 +56,13 @@ export async function apiFetch<T>(
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
-    const message =
-      (body as any)?.message ?? res.statusText ?? String(res.status);
+    const message = (body as any)?.message ?? res.statusText ?? String(res.status);
+
     console.error("[apiFetch] Error:", { status: res.status, message, body });
-    const error = new Error(message);
-    (error as any).status = res.status;
-    (error as any).body = body;
-    throw error;
+    throw new Error(JSON.stringify({
+      status: res.status,
+      message: message,
+    }));
   }
   return res.json();
 }

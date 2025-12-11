@@ -44,11 +44,6 @@ export function AppSidebar({ children, mlflow_url }: { children: ReactNode, mlfl
       icon: UserRoundPlus,
     },
     {
-      title: "Model Evaluations",
-      url: "/model-evaluations",
-      icon: FlaskConical,
-    },
-    {
       title: "MLflow",
       url: mlflow_url,
       icon: Database,

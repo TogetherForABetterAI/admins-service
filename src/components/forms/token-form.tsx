@@ -10,30 +10,34 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Combobox, ComboboxOption } from "@/components/ui/combobox";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { Toaster } from "@/components/ui/sonner";
 import { apiFetch } from "@/external/api";
 import { UserType } from "@/lib/table-data-type";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  useMutation,
-  useQuery,
-  useQueryClient
-} from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   AlertTriangle,
   Check,
   Copy,
-  KeyRound,
   Loader2,
   ShieldCheck,
 } from "lucide-react";
@@ -44,7 +48,11 @@ import z from "zod";
 
 const FormSchema = z.object({
   username: z.string().min(1, "Username is required"),
+  max_uses: z.coerce.number().min(1, "Must be at least 1 use"),
+  expires_in_hours: z.coerce.number().min(1, "Must be at least 1 hour"),
 });
+
+type TokenFormData = z.infer<typeof FormSchema>;
 
 interface TokenCreateResponse {
   token: string;
@@ -57,7 +65,7 @@ const errorMessages: Record<number, string> = {
 };
 
 export async function createToken(
-  data: z.infer<typeof FormSchema>
+  data: TokenFormData
 ): Promise<TokenCreateResponse> {
   return apiFetch("/tokens/create", {
     method: "POST",
@@ -89,19 +97,39 @@ export function TokenForm() {
       sublabel: user.email,
     })) ?? [];
 
-  const form = useForm<z.infer<typeof FormSchema>>({
+  const form = useForm({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       username: "",
+      max_uses: 10,
+      expires_in_hours: 24,
     },
   });
+  const watchedHours = form.watch("expires_in_hours");
+
+  const getEstimatedExpiration = (hours: number) => {
+    if (!hours || isNaN(hours)) return "";
+    const date = new Date();
+    date.setHours(date.getHours() + Number(hours));
+    return date.toLocaleString("en-US", {
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
 
   const { mutateAsync } = useMutation({
-    mutationFn: (data: z.infer<typeof FormSchema>) => createToken(data),
+    mutationFn: (data: TokenFormData) => createToken(data),
     onSuccess: (response: TokenCreateResponse) => {
       queryClient.invalidateQueries({ queryKey: [UserType.TOKENS] });
       setGeneratedToken(response);
       setShowTokenModal(true);
+      form.reset({
+        username: "",
+        max_uses: 10,
+        expires_in_hours: 24,
+      });
     },
     onError: (error: any) => {
       const statusCode = Number(error.message);
@@ -111,15 +139,13 @@ export function TokenForm() {
           : "Failed to create token";
 
       toast.error(message);
-      form.setError("username", { message });
-
       if (isNaN(statusCode)) {
         console.error("Error while handling API error:", error);
       }
     },
   });
 
-  const onSubmit = async (data: z.infer<typeof FormSchema>) => {
+  const onSubmit = async (data: TokenFormData) => {
     setLoading(true);
     try {
       await mutateAsync(data);
@@ -132,16 +158,13 @@ export function TokenForm() {
 
   const handleCopyToken = async () => {
     if (!generatedToken?.token) return;
-
     try {
       await navigator.clipboard.writeText(generatedToken.token);
       setCopied(true);
       toast.success("Token copied to clipboard");
-
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       toast.error("Failed to copy token");
-      console.error("Failed to copy:", err);
     }
   };
 
@@ -149,75 +172,100 @@ export function TokenForm() {
     setShowTokenModal(false);
     setGeneratedToken(null);
     setCopied(false);
-    form.reset();
-  };
-
-  const formatExpiresAt = (expiresAt: string) => {
-    try {
-      const date = new Date(expiresAt);
-      return date.toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-    } catch {
-      return expiresAt;
-    }
   };
 
   return (
-    <div style={{ paddingBottom: "calc(var(--spacing) * 8)" }}>
-      <Card className="p-4" style={{ width: "fit-content" }}>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <FormField
-              control={form.control}
-              name="username"
-              render={({ field }) => (
-                <FormItem>
-                  <div className="flex gap-4 items-end">
-                    <div className="flex flex-col gap-2">
-                      <FormLabel>Select User</FormLabel>
-                      <FormControl>
-                        <Combobox
-                          options={userOptions}
-                          value={field.value}
-                          onValueChange={field.onChange}
-                          placeholder="Select a user..."
-                          searchPlaceholder="Search by username or email..."
-                          emptyMessage="No user found"
-                          isLoading={usersLoading}
-                          className="w-80"
-                        />
-                      </FormControl>
-                    </div>
-                    <div className="flex justify-end">
-                      <Button
-                        type="submit"
-                        style={{ minWidth: "100px" }}
-                        disabled={loading || !field.value}
-                      >
-                        {loading ? (
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        ) : (
-                          <>
-                            <KeyRound className="mr-2 h-4 w-4" />
-                            Create
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </form>
-        </Form>
-      </Card>
+    <>
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>Generate New Token</CardTitle>
+          <CardDescription>
+            Create a secure access token for a specific user.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField
+                control={form.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem className="md:col-span-2">
+                    <FormLabel>Select User</FormLabel>
+                    <FormControl>
+                      <Combobox
+                        options={userOptions}
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        placeholder="Select a user..."
+                        searchPlaceholder="Search by username..."
+                        emptyMessage="No user found"
+                        isLoading={usersLoading}
+                        className="w-full"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
+              {/* Max Uses Field */}
+              <FormField
+                control={form.control}
+                name="max_uses"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Max Uses</FormLabel>
+                    <FormControl>
+                      <Input type="number" placeholder="10" {...field} value={field.value as number ?? ''} />
+                    </FormControl>
+                    <FormDescription>
+                      How many times this token can be used.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="expires_in_hours"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex justify-between">
+                      <span>Expires in (Hours)</span>
+                      {!!watchedHours && (
+                        <span
+                          suppressHydrationWarning={true}
+                          className="text-xs font-normal text-muted-foreground ml-2"
+                        >
+                          (Est: {getEstimatedExpiration(Number(watchedHours as string))})
+                        </span>
+                      )}
+                    </FormLabel>
+                    <FormControl>
+                      <Input type="number" placeholder="24" {...field} value={field.value as number ?? ''} />
+                    </FormControl>
+                    <FormDescription>
+                      Duration until the token becomes invalid.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <CardFooter className="md:col-span-2 p-0 pt-4">
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    "Generate Token"
+                  )}
+                </Button>
+              </CardFooter>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
       <AlertDialog open={showTokenModal} onOpenChange={setShowTokenModal}>
         <AlertDialogContent className="max-w-lg">
           <AlertDialogHeader>
@@ -232,8 +280,7 @@ export function TokenForm() {
                   <div className="text-sm">
                     <p className="mt-1">
                       This is the <strong>only time</strong> this token will be
-                      visible. Please copy it and store it somewhere safe. You
-                      will not be able to see it again.
+                      visible. Please copy it now.
                     </p>
                   </div>
                 </div>
@@ -245,7 +292,7 @@ export function TokenForm() {
                         type="text"
                         readOnly
                         value={generatedToken?.token ?? ""}
-                        className="w-full rounded-md border bg-muted px-3 py-2 pr-10 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                        className="w-full rounded-md border bg-muted px-3 py-2 pr-10 font-mono text-sm focus:outline-none"
                       />
                     </div>
                     <Button
@@ -253,41 +300,17 @@ export function TokenForm() {
                       variant={copied ? "default" : "outline"}
                       size="sm"
                       onClick={handleCopyToken}
-                      className={`min-w-24 transition-all ${
-                        copied
-                          ? "bg-emerald-600 hover:bg-emerald-700 text-white"
-                          : ""
-                      }`}
+                      className={copied ? "bg-emerald-600 text-white" : ""}
                     >
-                      {copied ? (
-                        <>
-                          <Check className="mr-2 h-4 w-4" />
-                          Copied!
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="mr-2 h-4 w-4" />
-                          Copy
-                        </>
-                      )}
+                      {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                     </Button>
                   </div>
                 </div>
-
-                {generatedToken?.expires_at && (
-                  <div className="rounded-md bg-muted p-3">
-                    <p className="text-xs text-muted-foreground">
-                      <strong>Expires:</strong>{" "}
-                      {formatExpiresAt(generatedToken.expires_at)}
-                    </p>
-                  </div>
-                )}
               </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="mt-4">
             <Button onClick={handleCloseModal} className="w-full sm:w-auto">
-              <Check className="mr-2 h-4 w-4" />
               I have saved the token
             </Button>
           </AlertDialogFooter>
@@ -295,6 +318,6 @@ export function TokenForm() {
       </AlertDialog>
 
       <Toaster richColors />
-    </div>
+    </>
   );
 }

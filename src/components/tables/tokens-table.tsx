@@ -7,7 +7,6 @@ import { toShortTimestamp } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2, Search } from "lucide-react";
 import { useState } from "react";
-import { TokenForm } from "../forms/token-form";
 import { Input } from "../ui/input";
 
 export function TokensTable() {
@@ -21,6 +20,8 @@ export function TokensTable() {
       }),
   });
 
+  console.log("Tokens data:", data);
+
   data?.forEach((token) => {
     token.token_hash = token.token_hash.slice(0, 16) + "...";
     token.created_at = toShortTimestamp(token.created_at);
@@ -29,7 +30,6 @@ export function TokensTable() {
 
   return (
     <>
-      <TokenForm />
       {isLoading ? (
         <div className="p-16">
           {" "}
