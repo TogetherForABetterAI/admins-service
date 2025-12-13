@@ -14,8 +14,9 @@ interface UseDuckDBResult {
   isReady: boolean;
   error: string | null;
   data: MNISTRow[];
-  loadParquetFile: (file: File) => Promise<void>;
-  clearData: () => void;
+  loadedFiles: string[];
+  loadParquetFiles: (files: File[]) => Promise<void>;
+  clearData: () => Promise<void>;
 }
 
 export function useDuckDB(): UseDuckDBResult {
@@ -23,9 +24,11 @@ export function useDuckDB(): UseDuckDBResult {
   const [isReady, setIsReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<MNISTRow[]>([]);
+  const [loadedFiles, setLoadedFiles] = useState<string[]>([]);
   
   const dbRef = useRef<duckdb.AsyncDuckDB | null>(null);
   const connRef = useRef<duckdb.AsyncDuckDBConnection | null>(null);
+  const registeredFilesRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     let cancelled = false;
@@ -82,9 +85,14 @@ export function useDuckDB(): UseDuckDBResult {
     };
   }, []);
 
-  const loadParquetFile = useCallback(async (file: File) => {
+  const loadParquetFiles = useCallback(async (files: File[]) => {
     if (!dbRef.current || !connRef.current) {
       setError("DuckDB not initialized");
+      return;
+    }
+
+    if (files.length === 0) {
+      setError("No files provided");
       return;
     }
 
@@ -95,18 +103,25 @@ export function useDuckDB(): UseDuckDBResult {
       const db = dbRef.current;
       const conn = connRef.current;
 
-      const arrayBuffer = await file.arrayBuffer();
-      const uint8Array = new Uint8Array(arrayBuffer);
+      const fileNames: string[] = [];
+      for (const file of files) {
+        const arrayBuffer = await file.arrayBuffer();
+        const uint8Array = new Uint8Array(arrayBuffer);
+        await db.registerFileBuffer(file.name, uint8Array);
+        registeredFilesRef.current.add(file.name);
+        fileNames.push(file.name);
+      }
 
-      await db.registerFileBuffer(file.name, uint8Array);
-
-      const result = await conn.query(`
+      const fileListStr = fileNames.map(name => `'${name}'`).join(", ");
+      const query = `
         SELECT 
           input,
           y_pred,
           y_test
-        FROM read_parquet('${file.name}')
-      `);
+        FROM read_parquet([${fileListStr}])
+      `;
+
+      const result = await conn.query(query);
 
       const rows: MNISTRow[] = [];
       
@@ -163,15 +178,27 @@ export function useDuckDB(): UseDuckDBResult {
       }
 
       setData(rows);
+      setLoadedFiles(fileNames);
       setIsLoading(false);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load parquet file");
+      setError(err instanceof Error ? err.message : "Failed to load parquet files");
       setIsLoading(false);
     }
   }, []);
 
-  const clearData = useCallback(() => {
+  const clearData = useCallback(async () => {
+    if (dbRef.current) {
+      for (const fileName of registeredFilesRef.current) {
+        try {
+          await dbRef.current.dropFile(fileName);
+        } catch {
+        }
+      }
+      registeredFilesRef.current.clear();
+    }
+    
     setData([]);
+    setLoadedFiles([]);
     setError(null);
   }, []);
 
@@ -180,7 +207,8 @@ export function useDuckDB(): UseDuckDBResult {
     isReady,
     error,
     data,
-    loadParquetFile,
+    loadedFiles,
+    loadParquetFiles,
     clearData,
   };
 }

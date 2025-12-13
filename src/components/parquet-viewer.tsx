@@ -21,7 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDuckDB, type MNISTRow } from "@/hooks/useDuckDB";
-import { Upload, FileSpreadsheet, AlertCircle, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Upload, FileSpreadsheet, AlertCircle, Trash2, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 function findMaxIndex(arr: number[]): { index: number; value: number } {
@@ -217,15 +217,37 @@ const columns: ColumnDef<MNISTRow>[] = [
   },
 ];
 
-function ParquetDropzone({ onFileDrop, isLoading }: { onFileDrop: (file: File) => void; isLoading: boolean }) {
+function FileChip({ name, onRemove }: { name: string; onRemove?: () => void }) {
+  return (
+    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-full text-sm">
+      <FileSpreadsheet className="w-3.5 h-3.5" />
+      <span className="max-w-[150px] truncate">{name}</span>
+      {onRemove && (
+        <button
+          onClick={onRemove}
+          className="ml-0.5 p-0.5 hover:bg-indigo-200 dark:hover:bg-indigo-800 rounded-full transition-colors"
+        >
+          <X className="w-3 h-3" />
+        </button>
+      )}
+    </div>
+  );
+}
+
+function ParquetDropzone({ 
+  onFilesDrop, 
+  isLoading 
+}: { 
+  onFilesDrop: (files: File[]) => void; 
+  isLoading: boolean;
+}) {
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
-      const file = acceptedFiles[0];
-      if (file) {
-        onFileDrop(file);
+      if (acceptedFiles.length > 0) {
+        onFilesDrop(acceptedFiles);
       }
     },
-    [onFileDrop]
+    [onFilesDrop]
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -233,7 +255,7 @@ function ParquetDropzone({ onFileDrop, isLoading }: { onFileDrop: (file: File) =
     accept: {
       "application/octet-stream": [".parquet"],
     },
-    maxFiles: 1,
+    multiple: true,
     disabled: isLoading,
   });
 
@@ -261,8 +283,8 @@ function ParquetDropzone({ onFileDrop, isLoading }: { onFileDrop: (file: File) =
         <div>
           <p className="text-lg font-medium">
             {isDragActive
-              ? "Drop the file here..."
-              : "Drag & drop a Parquet file"}
+              ? "Drop the files here..."
+              : "Drag & drop Parquet files"}
           </p>
           <p className="text-sm text-muted-foreground mt-1">
             or click to browse your files
@@ -270,7 +292,7 @@ function ParquetDropzone({ onFileDrop, isLoading }: { onFileDrop: (file: File) =
         </div>
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <FileSpreadsheet className="w-4 h-4" />
-          <span>Load .parquet files from MLflow</span>
+          <span>Load multiple .parquet files from MLflow</span>
         </div>
       </div>
     </div>
@@ -446,20 +468,17 @@ function MNISTDataTable({ data }: { data: MNISTRow[] }) {
 }
 
 export function ParquetViewer() {
-  const { isLoading, isReady, error, data, loadParquetFile, clearData } = useDuckDB();
-  const [fileName, setFileName] = useState<string | null>(null);
+  const { isLoading, isReady, error, data, loadedFiles, loadParquetFiles, clearData } = useDuckDB();
 
-  const handleFileDrop = useCallback(
-    async (file: File) => {
-      setFileName(file.name);
-      await loadParquetFile(file);
+  const handleFilesDrop = useCallback(
+    async (files: File[]) => {
+      await loadParquetFiles(files);
     },
-    [loadParquetFile]
+    [loadParquetFiles]
   );
 
-  const handleClear = useCallback(() => {
-    clearData();
-    setFileName(null);
+  const handleClear = useCallback(async () => {
+    await clearData();
   }, [clearData]);
 
   if (!isReady && isLoading) {
@@ -496,19 +515,28 @@ export function ParquetViewer() {
   }
 
   if (data.length === 0) {
-    return <ParquetDropzone onFileDrop={handleFileDrop} isLoading={isLoading} />;
+    return <ParquetDropzone onFilesDrop={handleFilesDrop} isLoading={isLoading} />;
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <FileSpreadsheet className="w-5 h-5 text-indigo-500" />
-          <span className="font-medium">{fileName}</span>
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex-1">
+          <div className="flex items-center gap-2 mb-2">
+            <FileSpreadsheet className="w-5 h-5 text-indigo-500" />
+            <span className="font-medium">
+              {loadedFiles.length} {loadedFiles.length === 1 ? "file" : "files"} loaded
+            </span>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {loadedFiles.map((fileName) => (
+              <FileChip key={fileName} name={fileName} />
+            ))}
+          </div>
         </div>
         <Button variant="outline" size="sm" onClick={handleClear}>
           <Trash2 className="w-4 h-4 mr-2" />
-          Clear
+          Clear All
         </Button>
       </div>
 
