@@ -45,6 +45,7 @@ export default function InputForm() {
             />
           </div>
           <DataTable
+            isLoading={isLoading}
             data={data?.filter((admin) => admin.email.includes(search)) ?? []}
             columns={adminColumns}
           />
