@@ -1,6 +1,6 @@
 "use client";
 
-import { User } from "@/app/(authenticated)/(dashboard)/columns";
+import { User } from "@/app/(authenticated)/users/columns";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -9,15 +9,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { Combobox, ComboboxOption } from "@/components/ui/combobox";
 import {
   Form,
@@ -39,6 +39,7 @@ import {
   Check,
   Copy,
   Loader2,
+  Plus,
   ShieldCheck,
 } from "lucide-react";
 import { useState } from "react";
@@ -76,7 +77,11 @@ export async function createToken(
 
 export function TokenForm() {
   const [loading, setLoading] = useState(false);
+
+  const [isFormOpen, setIsFormOpen] = useState(false);
+
   const [showTokenModal, setShowTokenModal] = useState(false);
+
   const [generatedToken, setGeneratedToken] = useState<TokenCreateResponse | null>(null);
   const [copied, setCopied] = useState(false);
   const queryClient = useQueryClient();
@@ -124,7 +129,9 @@ export function TokenForm() {
     onSuccess: (response: TokenCreateResponse) => {
       queryClient.invalidateQueries({ queryKey: [UserType.TOKENS] });
       setGeneratedToken(response);
+      setIsFormOpen(false);
       setShowTokenModal(true);
+
       form.reset({
         username: "",
         max_uses: 10,
@@ -176,21 +183,28 @@ export function TokenForm() {
 
   return (
     <>
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle>Generate New Token</CardTitle>
-          <CardDescription>
-            Create a secure access token for a specific user.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+      <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+        <DialogTrigger asChild>
+          <Button>
+            <Plus className="mr-2 h-4 w-4" /> New Token
+          </Button>
+        </DialogTrigger>
+
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Generate New Token</DialogTitle>
+            <DialogDescription>
+              Create a secure access token for a specific user.
+            </DialogDescription>
+          </DialogHeader>
+
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4 py-4">
               <FormField
                 control={form.control}
                 name="username"
                 render={({ field }) => (
-                  <FormItem className="md:col-span-2">
+                  <FormItem>
                     <FormLabel>Select User</FormLabel>
                     <FormControl>
                       <Combobox
@@ -208,8 +222,6 @@ export function TokenForm() {
                   </FormItem>
                 )}
               />
-
-              {/* Max Uses Field */}
               <FormField
                 control={form.control}
                 name="max_uses"
@@ -220,7 +232,7 @@ export function TokenForm() {
                       <Input type="number" placeholder="10" {...field} value={field.value as number ?? ''} />
                     </FormControl>
                     <FormDescription>
-                      How many times this token can be used.
+                      Limit usage count.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -231,41 +243,36 @@ export function TokenForm() {
                 name="expires_in_hours"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="flex justify-between">
-                      <span>Expires in (Hours)</span>
-                      {!!watchedHours && (
-                        <span
-                          suppressHydrationWarning={true}
-                          className="text-xs font-normal text-muted-foreground ml-2"
-                        >
-                          (Est: {getEstimatedExpiration(Number(watchedHours as string))})
-                        </span>
-                      )}
+                    <FormLabel>
+                      Expires (Hours)
                     </FormLabel>
                     <FormControl>
                       <Input type="number" placeholder="24" {...field} value={field.value as number ?? ''} />
                     </FormControl>
-                    <FormDescription>
-                      Duration until the token becomes invalid.
-                    </FormDescription>
+                    {!!watchedHours && (
+                      <FormDescription suppressHydrationWarning>
+                        Est: {getEstimatedExpiration(Number(watchedHours as string))}
+                      </FormDescription>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              <CardFooter className="md:col-span-2 p-0 pt-4">
-                <Button type="submit" className="w-full" disabled={loading}>
+              <div className="flex justify-end pt-4">
+                <Button type="submit" className="w-full sm:w-auto" disabled={loading}>
                   {loading ? (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   ) : (
                     "Generate Token"
                   )}
                 </Button>
-              </CardFooter>
+              </div>
             </form>
           </Form>
-        </CardContent>
-      </Card>
+        </DialogContent>
+      </Dialog>
+
       <AlertDialog open={showTokenModal} onOpenChange={setShowTokenModal}>
         <AlertDialogContent className="max-w-lg">
           <AlertDialogHeader>

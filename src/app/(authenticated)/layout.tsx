@@ -35,7 +35,7 @@ export default async function RootLayout({
         </div>
       </div>
       <AppSidebar mlflow_url="/api/mlflow-redirect">
-        <div className="p-8" style={{ paddingTop: "calc(var(--spacing) * 16)" }}>
+        <div className="p-8" style={{ paddingTop: "calc(var(--spacing) * 8)" }}>
           {children}
         </div>
       </AppSidebar>

@@ -29,13 +29,13 @@ export function AppSidebar({ children, mlflow_url }: { children: ReactNode, mlfl
       icon: House,
     },
     {
-      title: "New User",
-      url: "/new-user",
-      icon: Plus,
+      title: "Users",
+      url: "/users",
+      icon: User,
     },
     {
-      title: "New token",
-      url: "/new-token",
+      title: "Tokens",
+      url: "/tokens",
       icon: KeyRound,
     },
     {

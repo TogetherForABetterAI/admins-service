@@ -1,5 +1,5 @@
 "use client";
-import { Token, tokenColumns } from "@/app/(authenticated)/new-token/columns";
+import { Token, tokenColumns } from "@/app/(authenticated)/tokens/columns";
 import { DataTable } from "@/components/data-table";
 import { apiFetch } from "@/external/api";
 import { UserType } from "@/lib/table-data-type";
@@ -8,6 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Loader2, Search } from "lucide-react";
 import { useState } from "react";
 import { Input } from "../ui/input";
+import { TokenForm } from "../forms/token-form";
 
 export function TokensTable() {
   const [search, setSearch] = useState("");
@@ -28,32 +29,33 @@ export function TokensTable() {
     token.expires_at = toShortTimestamp(token.expires_at);
   });
 
+  const displayColumns = tokenColumns.filter(
+    (col) => (col as any).accessorKey !== "lead_time"
+  );
+
   return (
     <>
-      {isLoading ? (
-        <div className="p-16">
-          {" "}
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-        </div>
-      ) : (
-        <>
-          <div className="relative flex items-center pb-4">
-            <Search className="absolute left-2 text-gray-400 w-4 h-4" />
-            <Input
-              className="pl-8 w-96"
-              placeholder="Search by username..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
-          <DataTable
-            data={
-              data?.filter((token) => token.username.includes(search)) ?? []
-            }
-            columns={tokenColumns}
+      <div className="flex items-center justify-between pb-4">
+        <div className="relative flex items-center">
+          <Search className="absolute left-2 text-gray-400 w-4 h-4" />
+          <Input
+            className="pl-8 w-96"
+            placeholder="Search by username..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
           />
-        </>
-      )}
+        </div>
+        <div>
+          <TokenForm />
+        </div>
+      </div>
+      <DataTable
+        data={
+          data?.filter((token) => token.username.includes(search)) ?? []
+        }
+        columns={displayColumns}
+        isLoading={isLoading}
+      />
     </>
   );
 }
