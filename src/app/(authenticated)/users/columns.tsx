@@ -1,5 +1,6 @@
 "use client";
 
+import { AuthorizationToggle } from "@/components/authorization-toggle";
 import { ColumnDef } from "@tanstack/react-table";
 import z from "zod";
 
@@ -48,5 +49,14 @@ export const userColumns: ColumnDef<User>[] = [
   {
     accessorKey: "is_authorized",
     header: "Authorized",
+    cell: ({ row }) => {
+      const user = row.original;
+      return (
+        <AuthorizationToggle
+          userId={user.id}
+          isAuthorized={user.is_authorized}
+        />
+      );
+    },
   },
 ];
